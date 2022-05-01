@@ -25,6 +25,10 @@ const routes: RouteRecordRaw[]=[
         component: () => import('../views/meet.vue'),
         props:true,
     },{
+        path: '/:g/:d/meet/',
+        component: () => import('../views/meetwait.vue'),
+        props:true,
+    },{
         path: '/:g/game/',
         component: () => import('../views/host.vue'),
         props:true,

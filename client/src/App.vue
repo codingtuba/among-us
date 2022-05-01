@@ -12,6 +12,15 @@
 
 <style lang='scss'>
   body,html{
-    padding:0px;
+    margin:0px;
+  }
+  .app-main{
+    height:calc(100vh);
+    overflow-y:scroll;
+  }
+  *{
+    font-family: 'Lato', sans-serif;
+    max-width:100vw !important;
+    max-height:100vh !important;
   }
 </style>

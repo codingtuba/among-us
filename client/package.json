@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "cookies-js": "^1.2.3",
     "sass": "^1.51.0",
     "vue": "^3.2.25",
     "vue-class-component": "^7.2.6",

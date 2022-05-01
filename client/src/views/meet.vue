@@ -1,6 +1,6 @@
 <template>
   <div class='meet-main'>
-    meet
+    <img src="https://i.imgur.com/Ql0q1oB.png">
   </div>
 </template>
 
