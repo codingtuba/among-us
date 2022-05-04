@@ -32,7 +32,13 @@ const routes: RouteRecordRaw[]=[
         path: '/:g/game/',
         component: () => import('../views/host.vue'),
         props:true,
-    },
+    },{
+        path: '/crew/',
+        component: () => import('../views/crew.vue'),
+    },{
+        path: '/imposter/',
+        component: () => import('../views/imposter.vue'),
+    }
 ]
 
 export default createRouter({
