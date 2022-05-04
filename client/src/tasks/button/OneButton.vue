@@ -1,6 +1,6 @@
 <template>
   <div class='onebutton-main'>
-    onebutton
+    <img src="https://i.imgur.com/EUBmCyl.png" style="width:100%;cursor:pointer;" @click="$emit('do')">
   </div>
 </template>
 
