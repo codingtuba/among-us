@@ -21,7 +21,7 @@
   
   export default defineComponent({
     components:{
-      task:RandomLetters,
+      task:Targets,
     },
     methods:{
       finishtask(){
