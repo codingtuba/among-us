@@ -53,19 +53,6 @@ async function main(){
     await sequelize.authenticate();
     await sequelize.sync();
 
-    await Game.destroy({
-        where: {},
-        truncate: true
-    })
-    await Device.destroy({
-        where: {},
-        truncate: true
-    })
-    await Player.destroy({
-        where: {},
-        truncate: true
-    })
-
     app.listen(4000)
 }
 
