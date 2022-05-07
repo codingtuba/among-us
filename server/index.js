@@ -51,7 +51,7 @@ Player.init({
 
 async function main(){
     await sequelize.authenticate();
-    await sequelize.sync({force:true});
+    await sequelize.sync();
 
     await Game.destroy({
         where: {},
@@ -73,6 +73,22 @@ app.use(express.json())
 app.use(cors());
 app.use(express.urlencoded({extended: true}));
 main()
+
+app.get("/reset/",async function(req, res){
+    await Game.destroy({
+        where: {},
+        truncate: true
+    })
+    await Device.destroy({
+        where: {},
+        truncate: true
+    })
+    await Player.destroy({
+        where: {},
+        truncate: true
+    })
+    res.send("reset")
+})
 
 // this is used to create a game
 app.post("/game/", async function(req, res){
