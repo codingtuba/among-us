@@ -69,7 +69,11 @@
           alert("Please select an animal, action, and place")
           return
         }else if(this.code.animal+"|"+this.code.action+"|"+this.code.place==this.players[this.selected].code){
-          this.$router.push(`/${this.$route.params.g}/${this.$route.params.d}/${this.players[this.selected].code.replace(/ /g,"-")}/task/`)
+          if(!this.players[this.selected].done.includes(this.$route.params.d)){
+            this.$router.push(`/${this.$route.params.g}/${this.$route.params.d}/${this.players[this.selected].id}/task/?reload=true`)
+          }else{
+            alert("You've already completed this task")
+          }
         }else{
           alert("Incorrect code")
           return
@@ -109,6 +113,7 @@
     justify-content:center;
     align-items:center;
     vertical-align:middle;
+    overflow-y:auto;
   }
   .game-content{
     max-width:80%;
@@ -118,6 +123,8 @@
   .game-button{
     height: 150px;
     width: 150px;
+    max-width:calc(80vw - 20px) !important;
+    max-height:calc(80vw - 20px) !important;
     margin:10px;
     border:none;
     cursor:pointer;

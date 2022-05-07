@@ -10,24 +10,46 @@
   import ThreeButtons from '../tasks/button/ThreeButtons.vue'
   import SimonSays from '../tasks/games/SimonSays.vue'
   import Targets from '../tasks/games/Targets.vue'
-  import TicTacToe from '../tasks/games/TicTacToe.vue'
   import RandomLetters from '../tasks/ten-slot-tasks/RandomLetters.vue'
   import RandomNumbers from '../tasks/ten-slot-tasks/RandomNumbers.vue'
   import SetLetters from '../tasks/ten-slot-tasks/SetLetters.vue'
   import SetNumbers from '../tasks/ten-slot-tasks/SetNumbers.vue'
   import FiveWires from '../tasks/wires/FiveWires.vue'
   import ThreeWires from '../tasks/wires/ThreeWires.vue'
-  const tasks=[]
+  import server from '../server/'
+  import cookies from 'cookies-js'
+  const tasks=[OneButton,ThreeButtons,SimonSays,SimonSays,RandomLetters,RandomNumbers,SetLetters,SetNumbers,FiveWires,ThreeWires,Targets,Targets]
   
   export default defineComponent({
     components:{
-      task:Targets,
+      task:tasks[Math.floor(Math.random()*tasks.length)]
     },
     methods:{
-      finishtask(){
-        alert("Task finished")
+      async finishtask(){
+        let data=await fetch(`${server}/${this.$route.params.g}/${this.$route.params.d}/${this.$route.params.p}/task/?passcode=${cookies.get('passcode')}`,{method:"POST"})
+        console.log(data,data.status)
+        if(!data.ok){
+          alert("Something went wrong")
+        }else{
+          this.$router.push(`/${this.$route.params.g}/${this.$route.params.d}/game/`)
+        }
       }
-    }
+    },
+    async mounted(){
+      if(this.$route.query.reload=="true"){
+        console.log("reloading")
+        location.replace(location.href.replace("?reload=true",""))
+      }
+      let data=await fetch(`${server}/${this.$route.params.g}/updates/?passcode=${cookies.get('passcode')}`)
+      if(data.status==404){alert("Game not found");this.$router.push("/")}
+      else if(data.status==307){this.$router.push(`/${this.$route.params.g}/${this.$route.params.d}/meet/`)}
+      else if(data.status==410){
+        if(await data.text()=="Crewmates win"){
+          this.$router.push("/crew/")
+        }else{this.$router.push("/imposter/")}
+      }
+      else setTimeout(()=>{location.reload()},500)
+    },
   })
 </script>
 

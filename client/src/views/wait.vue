@@ -49,6 +49,9 @@
     .wait-infobox{
       width:calc(80vw - 20px);
     }
+    .wait-infobox > b{
+      font-size:1em;
+    }
     *{padding: 0px;}
   }
 </style>

@@ -257,6 +257,7 @@ app.post("/:game/meeting/toggle/",async function(req, res){
     res.json({meeting:game.meeting})
 })
 
+// gets a list of all players
 app.get("/:game/players/",async function(req, res){
     const parse=JSON.parse
     let game=await Game.findOne({where:{code:req.params.game}})
@@ -281,6 +282,34 @@ app.get("/:game/players/",async function(req, res){
                 players:players,
                 imposters:imposters
             })
+        }else{res.status(404).send("Game not found");return}
+    }
+})
+
+app.post("/:game/:device/:player/task/",async function(req, res){
+    let game=await Game.findOne({where:{code:req.params.game}})
+    if(!await Game.findOne({where:{code:req.params.game}})){
+        res.status(404).send("Game not found");return
+    }else{
+        if(
+            await Device.findOne({where:{passcode:req.query.passcode,game:game.id}})||
+            await Game.findOne({where:{code:req.params.game,passcode:req.query.passcode}})
+        ){
+            let player=await Player.findOne({where:{id:req.params.player-0,game:req.params.game}})
+            if(!player){
+                res.status(404).send("Player not found");return
+            }else{
+                if(player.tasks!=0){
+                    player.tasks--
+                    game.tasks--
+                }
+                let done=JSON.parse(player.done)
+                done.push(req.params.device)
+                player.done=JSON.stringify(done)
+                await game.save()
+                await player.save()
+                res.json({sucess:true})
+            }
         }else{res.status(404).send("Game not found");return}
     }
 })
