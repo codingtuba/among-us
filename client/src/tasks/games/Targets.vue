@@ -3,7 +3,7 @@
     <button 
         class="target" 
         v-for='(target,index) in targets' 
-        :key='target' 
+        :key='target+""' 
         :disabled='!target' 
         @click='clicked(index)'
     ></button>

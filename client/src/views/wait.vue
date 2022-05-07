@@ -1,8 +1,8 @@
 <template>
   <div class='wait-main'>
     <div class="wait-infobox">
-      <b>The game code is {{this.$route.params.g}}</b>
-      <b>Your device id is {{this.$route.params.d}}</b>
+      <b>The game code is {{$route.params.g}}</b>
+      <b>Your device id is {{$route.params.d}}</b>
     </div>
   </div>
 </template>

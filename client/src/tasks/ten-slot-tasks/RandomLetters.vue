@@ -18,21 +18,22 @@
       }
     },
     mounted(){
-        let min=0;
-        let max=1;
-        for(let i of [0,0,0,0,0,0,0,0,0,0].keys()){
-            let add=Math.floor(Math.random()*(max-min+1)+min)
-            this.letters.push(this.letters_arr[add])
-            min+=2
-            max+=2
-        }
-        this._update()
+      let min=0;
+      let max=1;
+      for(let i of [0,0,0,0,0,0,0,0,0,0].keys()){
+        function r(max:number,min:number):number{return Math.floor(Math.random()*(max-min+1)+min)}
+        let add:number=r(max,min);
+        (this.letters as any).push(this.letters_arr[add])
+        min+=2
+        max+=2
+      }
+      this._update()
     },
     methods:{
-        parse(arr:any){return JSON.parse(arr)},
-        _update(){
-            this.update++;
-        }
+      parse(arr:any){return JSON.parse(arr)},
+      _update(){
+          this.update++;
+      }
     }
   })
 </script>

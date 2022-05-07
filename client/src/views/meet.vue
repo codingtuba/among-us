@@ -4,8 +4,8 @@
       <div class="meet-content">
         <button 
           v-for="(player,index) in players" 
-          :key="player.id+''+disabled[index]" 
-          :style="{'background-color':colors[player.color]}" 
+          :key="key(player,'id')+''+disabled[index]" 
+          :style="{'background-color':colors[key(player,'color')]}" 
           @click="toggle(index)"
           class="meet-button"
           :class="{'gray':disabled[index]}"
@@ -32,7 +32,7 @@
     },
     data(){return{
       players:[],
-      disabled:[],
+      disabled:[] as boolean[],
       colors:["blue","green","red","yellow","black","brown","pink","purple","orange","gray","lightgray","cyan"],
     }},
     methods:{
@@ -40,12 +40,15 @@
         this.disabled[index]=!this.disabled[index]
       },
       async end(){
-        let eliminated=[];
-        this.disabled.forEach((i:boolean,d:number)=>{if(i==true){eliminated.push(this.players[d].id)}})
+        let eliminated:any[]=[];
+        this.disabled.forEach((i:boolean,d:number)=>{if(i==true){eliminated.push((this.players as any[])[d].id)}})
         await fetch(`${server}/${this.$route.params.g}/meeting/toggle/?passcode=${cookies.get("passcode")}`,{method:"POST",body:JSON.stringify({
           eliminated:eliminated,
         }),headers:{'Content-Type':'application/json'}})
         this.$router.push(`/${this.$route.params.g}/manage/`)
+      },
+      key(object:any,key:any){
+        return object[key]
       }
     }
   })

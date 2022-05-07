@@ -4,8 +4,8 @@
       <div class="game-content">
         <button 
           v-for="(player,index) in players" 
-          :key="player.id+''+selected" 
-          :style="{'background-color':colors[player.color]}" 
+          :key="key(player,'id')+''+selected" 
+          :style="{'background-color':colors[key(player,'color')]}" 
           @click="selected=index"
           class="game-button"
           :class="{'gray':selected==index}"
@@ -68,9 +68,9 @@
         if(this.code.animal+"|"+this.code.action+"|"+this.code.place=="-1|-1|-1"){
           alert("Please select an animal, action, and place")
           return
-        }else if(this.code.animal+"|"+this.code.action+"|"+this.code.place==this.players[this.selected].code){
-          if(!this.players[this.selected].done.includes(this.$route.params.d)){
-            this.$router.push(`/${this.$route.params.g}/${this.$route.params.d}/${this.players[this.selected].id}/task/?reload=true`)
+        }else if(this.code.animal+"|"+this.code.action+"|"+this.code.place==(this.players as any)[this.selected].code){
+          if(!(this.players as any)[this.selected].done.includes(this.$route.params.d)){
+            this.$router.push(`/${this.$route.params.g}/${this.$route.params.d}/${(this.players as any)[this.selected].id}/task/?reload=true`)
           }else{
             alert("You've already completed this task")
           }
@@ -78,6 +78,9 @@
           alert("Incorrect code")
           return
         }
+      },
+      key(object:any, key:any){
+        return object[key]
       }
     },
     data(){

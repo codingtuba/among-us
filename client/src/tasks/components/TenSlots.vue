@@ -3,31 +3,35 @@
     <button class="tenslots-item"
         v-for="(item,index) in shuffled"
         :key="index"
-        :class="{'selected':orginal.indexOf(item)<current}"
+        :class="{'selected':ogindex(item)<current}"
         @click="next()"
-        :disabled="current!=orginal.indexOf(item)"
+        :disabled="current!=ogindex(item)"
     >{{item}}</button>
   </div>
 </template>
 
 <script lang='ts'>
   import { defineComponent } from 'vue';
+  import { AnyObject, _AnyObject } from '../../types/'
   
   export default defineComponent({
     data(){
-        return{
-            orginal:this.$attrs.items,
-            shuffled:JSON.parse(JSON.stringify(this.$attrs.items)).sort(()=>Math.random()-0.5),
-            current:0,
-        }
+      return{
+        orginal:this.$attrs.items?this.$attrs.items:[] as AnyObject,
+        shuffled:JSON.parse(JSON.stringify(this.$attrs.items)).sort(()=>Math.random()-0.5),
+        current:0,
+      }
     },
     methods:{
-        next(){
-            this.current++;
-            if(this.current==10){
-                this.$emit('do')
-            }
+      next(){
+        this.current++;
+        if(this.current==10){
+          this.$emit('do')
         }
+      },
+      ogindex(item:string){
+        return (this.orginal as any).indexOf(item)
+      }
     }
   })
 </script>

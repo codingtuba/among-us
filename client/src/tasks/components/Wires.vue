@@ -29,7 +29,7 @@
     async mounted(){
         let dummy=d(this.$attrs.wires)
         this.lshuffled=dummy.sort(()=> 0.5 - Math.random())
-        this.rshuffled=this.$attrs.wires.sort(()=> 0.5 - Math.random())
+        this.rshuffled=(this.$attrs.wires as any).sort(()=> 0.5 - Math.random())
     },
     data(){return{
         l:'left',
@@ -48,8 +48,8 @@
                 this.right=item
             }
             if(this.left===this.right){
-                this.lshuffled.splice(this.lshuffled.indexOf(this.left),1)
-                this.rshuffled.splice(this.rshuffled.indexOf(this.left),1)
+                this.lshuffled.splice((this.lshuffled as any).indexOf(this.left),1)
+                this.rshuffled.splice((this.rshuffled as any).indexOf(this.left),1)
             }
             if(this.lshuffled.length===0){
                 this.$emit('do')

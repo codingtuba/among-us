@@ -24,12 +24,12 @@
         </li>
       </ul>
     </div>
-    <div class="colors" :style="{'background-color':currentrolecolor}">
+    <div class="colors" :style="{'background-color':currentrolecolor()}">
       <div class="crew-info" v-if="showingrole">
         <b v-if="playerdata[currentrole].imposter" style="color:red">Imposter<br></b>
         <b v-else style="color:green">Crewmate<br></b>
-        <b>Code: {{currentrolecode}}</b><br>
-        <b>Color: {{currentrolecolor}}</b>
+        <b>Code: {{currentrolecode()}}</b><br>
+        <b>Color: {{currentrolecolor()}}</b>
       </div>
     </div>
   </div>
@@ -47,11 +47,11 @@
   
   export default defineComponent({
     data(){return{
-      devices:[],
+      devices:[] as any[],
       players:1,
-      playerdata:[],
+      playerdata:[] as any[],
       starting:false,
-      colors:["blue","green","red","yellow","black","brown","pink","purple","orange","gray","lightgray","cyan"],
+      colors:["blue","green","red","yellow","black","brown","pink","purple","orange","gray","lightgray","cyan"] as string[],
       showingrole:false,
       currentrole:0,
     }},
@@ -62,6 +62,16 @@
       this.getdevices()
     },
     methods:{
+      currentrolecolor(){
+        return this.showingrole?this.colors[this.playerdata[this.currentrole].color]:"white"
+      },
+      currentrolecode(){
+        let split=this.playerdata[this.currentrole].code.split("|")
+        split[0]=split[0].toLowerCase()
+        split[1]=split[1].toLowerCase()
+        split[2]="in "+split[2]
+        return "A "+split.join(" ")
+      },
       async getdevices(){
         let devices=await fetch(`${server}/${this.$route.params.g}/devices/update/?passcode=${cookies.get('passcode')}`)
         if(devices.status==404){alert("Game not found");this.$router.push("/")}
@@ -132,18 +142,6 @@
         }
       },
     },
-    computed:{
-      currentrolecolor(){
-        return this.showingrole?this.colors[this.playerdata[this.currentrole].color]:"white"
-      },
-      currentrolecode(){
-        let split=this.playerdata[this.currentrole].code.split("|")
-        split[0]=split[0].toLowerCase()
-        split[1]=split[1].toLowerCase()
-        split[2]="in "+split[2]
-        return "A "+split.join(" ")
-      }
-    }
   })
 </script>
 

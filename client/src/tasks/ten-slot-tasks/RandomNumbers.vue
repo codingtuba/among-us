@@ -20,8 +20,8 @@
         let min=1;
         let max=15;
         for(let i of [0,0,0,0,0,0,0,0,0,0].keys()){
-            let add=Math.floor(Math.random()*(max-min+1)+min)
-            this.num.push(add)
+            let add=Math.floor(Math.random()*(max-min+1)+min);
+            (this.num as any).push(add)
             min+=15
             max+=15
         }
