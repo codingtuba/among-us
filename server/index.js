@@ -59,6 +59,7 @@ async function main(){
 app.use(express.json())
 app.use(cors());
 app.use(express.urlencoded({extended: true}));
+
 main()
 
 app.get("/reset/",async function(req, res){

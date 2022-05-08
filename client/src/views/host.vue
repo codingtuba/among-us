@@ -14,7 +14,7 @@
         <b>{{devices.length}} device{{devices.length==1?'':'s'}}</b><br>
         <b v-if="!starting"><input type="number" v-model="players" class="small-input" :style="{'width':players.toString().split('').length==0?'30px':players.toString().split('').length*10+20+'px'}"> player{{players==1?'':'s'}}<br></b>
         <b v-else>{{players}} player{{players==1?'':'s'}}<br></b>
-        <b>{{floor(players/4)}} imposter{{floor(players/4)==1?'':'s'}}</b>
+        <b>{{floor(players/3.5)}} imposter{{floor(players/3.5)==1?'':'s'}}</b>
       </div>
     </div>
     <div class="device-list">
@@ -30,6 +30,9 @@
         <b v-else style="color:green">Crewmate<br></b>
         <b>Code: {{currentrolecode()}}</b><br>
         <b>Color: {{currentrolecolor()}}</b>
+        <b v-if="playerdata[currentrole].imposter"><br><br>Imposters:
+          <b v-for="color in otherimposters()" :key="color" :style="{'color':color}">{{color}}&nbsp;</b>
+        </b>
       </div>
     </div>
   </div>
@@ -99,7 +102,7 @@
         }
         this.starting=true;
         let playerdata=[];
-        let imposters=Math.floor(this.players/4)
+        let imposters=Math.floor(this.players/3.5)
         let colors=[0,1,2,3,4,5,6,7,8,9,10,11]
         for(let i=0;i<this.players;i++){
           colors.sort(() => Math.random() - 0.5);
@@ -141,6 +144,15 @@
           }
         }
       },
+      otherimposters(){
+        let colors=[] as string[]
+        this.playerdata.forEach(i=>{
+          if(i.imposter){
+            colors.push(this.colors[i.color])
+          }
+        })
+        return colors
+      }
     },
   })
 </script>

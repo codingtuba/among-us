@@ -7,7 +7,9 @@
 <script lang='ts'>
   import { defineComponent } from 'vue';
   
-  export default defineComponent({})
+  export default defineComponent({
+    
+  })
 </script>
 
 <style lang='scss'>
@@ -21,6 +23,5 @@
   *{
     font-family: 'Lato', sans-serif;
     max-width:100vw !important;
-    max-height:100vh !important;
   }
 </style>
