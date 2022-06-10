@@ -14,7 +14,9 @@
         <b>{{devices.length}} device{{devices.length==1?'':'s'}}</b><br>
         <b v-if="!starting"><input type="number" v-model="players" class="small-input" :style="{'width':players.toString().split('').length==0?'30px':players.toString().split('').length*10+20+'px'}"> player{{players==1?'':'s'}}<br></b>
         <b v-else>{{players}} player{{players==1?'':'s'}}<br></b>
-        <b>{{floor(players/3.5)}} imposter{{floor(players/3.5)==1?'':'s'}}</b>
+        <b>{{floor(players/3.5)}} imposter{{floor(players/3.5)==1?'':'s'}}</b><br>
+        <b><input type="checkbox" :disabled="starting||jester==false" v-model="jestersee"> jesters see imposters</b><br>
+        <b><input type="checkbox" :disabled="starting" v-model="jester"> jester</b>
       </div>
     </div>
     <div class="device-list">
@@ -27,11 +29,13 @@
     <div class="colors" :style="{'background-color':currentrolecolor()}">
       <div class="crew-info" v-if="showingrole">
         <b v-if="playerdata[currentrole].imposter" style="color:red">Imposter<br></b>
+        <b v-else-if="playerdata[currentrole].jester" style="color:purple">Jester<br></b>
         <b v-else style="color:green">Crewmate<br></b>
         <b>Code: {{currentrolecode()}}</b><br>
         <b>Color: {{currentrolecolor()}}</b>
-        <b v-if="playerdata[currentrole].imposter"><br><br>Imposters:
-          <b v-for="color in otherimposters()" :key="color" :style="{'color':color}">{{color}}&nbsp;</b>
+        <b v-if="playerdata[currentrole].imposter||(jestersee==true&&playerdata[currentrole].jester)"><br><br>Imposters:
+          <b v-for="color in otherimposters()" :key="color" :style="{'color':color}">{{color}}&nbsp;</b><br>
+          Jester: <b :style="{'color':jestercolor()}">{{jestercolor()}}</b>
         </b>
       </div>
     </div>
@@ -57,6 +61,8 @@
       colors:["blue","green","red","yellow","black","brown","pink","purple","orange","gray","lightgray","cyan"] as string[],
       showingrole:false,
       currentrole:0,
+      jester:false,
+      jestersee:false,
     }},
     async mounted(){
       let devices=await fetch(`${server}/${this.$route.params.g}/devices/?passcode=${cookies.get('passcode')}`)
@@ -90,8 +96,8 @@
         }
       },
       async giveroles(){
-        if(this.players-0<0){
-          alert("You can't have less than 0 players")
+        if(this.players-4<0){
+          alert("You can't have less than 4 players")
           this.starting=false;
           return
         }
@@ -103,11 +109,13 @@
         this.starting=true;
         let playerdata=[];
         let imposters=Math.floor(this.players/3.5)
+        let jester=[this.jester][0]
         let colors=[0,1,2,3,4,5,6,7,8,9,10,11]
         for(let i=0;i<this.players;i++){
           colors.sort(() => Math.random() - 0.5);
           playerdata.push({
             imposter:imposters>0,
+            jester:jester==true&&imposters<=0,
             color:colors.shift(),
             code:
               code.animals.sort(() => 0.5 - Math.random())[0]+"|"
@@ -118,8 +126,10 @@
             game:this.devices[0].game,
           })
           imposters--
+          if(imposters<0){jester=false}
         }
         this.playerdata=playerdata.sort(() => 0.5 - Math.random())
+        console.log(playerdata)
       },
       floor(num:number){
         return Math.floor(num)
@@ -133,6 +143,7 @@
             body:JSON.stringify({
               playerdata:this.playerdata,
               tasks:this.devices.length,
+              jester: this.jester+'',
             }),
             headers:{
               "Content-Type":"application/json",
@@ -152,6 +163,14 @@
           }
         })
         return colors
+      },
+      jestercolor(){
+        for(let i=0;i<this.playerdata.length;i++){
+          if(this.playerdata[i].jester){
+            return this.colors[this.playerdata[i].color]
+          }
+        }
+        return "white"
       }
     },
   })

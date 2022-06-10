@@ -20,9 +20,11 @@
       if(data.status==404){alert("Game not found");this.$router.push("/")}
       else if(data.status==302){this.$router.push(`/${this.$route.params.g}/${this.$route.params.d}/game/`)}
       else if(data.status==410){
-        if(await data.text()=="Crewmates win"){
-            this.$router.push("/crew/")
-        }else{this.$router.push("/imposter/")}
+        let text=await data.text()
+        if(text=="Crewmates win"){
+          this.$router.push("/crew/")
+        }else if(text=="Imposters win"){this.$router.push("/imposter/")}
+        else {this.$router.push("/jester/")}
       }
       else setTimeout(()=>{location.reload()},500)
     }

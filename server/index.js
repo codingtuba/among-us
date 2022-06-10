@@ -32,6 +32,8 @@ Game.init({
     devices:DataTypes.TEXT,
     players:DataTypes.TEXT,
     imposters:DataTypes.TEXT,
+    jesters:DataTypes.TEXT,
+    jester:DataTypes.BOOLEAN,
     tasks:DataTypes.NUMBER,
 },{sequelize})
 Device.init({
@@ -42,6 +44,7 @@ Device.init({
 },{sequelize})
 Player.init({
     imposter:DataTypes.BOOLEAN,
+    jester:DataTypes.BOOLEAN,
     color: DataTypes.NUMBER,
     code:DataTypes.TEXT,
     tasks:DataTypes.NUMBER,
@@ -89,6 +92,8 @@ app.post("/game/", async function(req, res){
         passcode:crypto.randomBytes(10).toString('hex'),
         meeting:false,
         started:false,
+        jester:false,
+        jesters:JSON.stringify([]),
         devices:JSON.stringify([]),
         players:JSON.stringify([]),
         imposters:JSON.stringify([]),
@@ -167,7 +172,7 @@ app.get("/:game/started/", async function(req, res){
 
 // start a game
 app.post("/:game/start/", async function(req, res){
-    if(!(req.body.playerdata&&req.body.tasks)){
+    if(!(req.body.playerdata&&req.body.tasks&&req.body.jester)){
         res.status(406).send("No player data");return
     }
 
@@ -180,6 +185,7 @@ app.post("/:game/start/", async function(req, res){
     }
     for(let i of req.body.playerdata){
         let newplayer=await Player.create({
+            jester:i.jester,
             imposter:i.imposter,
             color:i.color,
             code:i.code,
@@ -193,10 +199,13 @@ app.post("/:game/start/", async function(req, res){
         console.log(game)
         let imposters=JSON.parse(game.imposters);
         let players=JSON.parse(game.players);
+        let jesters=JSON.parse(game.jesters);
         players.push(newplayer.id)
         if(i.imposter==true){imposters.push(newplayer.id)}
+        if(i.jester==true){jesters.push(newplayer.id)}
         game.players=JSON.stringify(players)
         game.imposters=JSON.stringify(imposters)
+        game.jesters=JSON.stringify(jesters)
         await game.save()
 
         // don't touch it, it works end
@@ -206,6 +215,7 @@ app.post("/:game/start/", async function(req, res){
     let t=req.body.tasks-0
     console.log(t,req.body.tasks,JSON.parse(game.players),JSON.parse(game.imposters))
     game.tasks=(t*JSON.parse(game.players).length)-(t*JSON.parse(game.imposters).length)
+    game.jester=req.body.jester
     await game.save()
     res.json({started:true})
 })
@@ -225,9 +235,18 @@ app.get("/:game/updates/",async function(req, res) {
             let interval=setInterval(async ()=>{
                 const parse=JSON.parse
                 let currentgame=await Game.findOne({where:{code:req.params.game}})
-                console.log(parse(currentgame.players),parse(currentgame.imposters))
-                if(currentgame.tasks==0||parse(currentgame.imposters).length==0||parse(currentgame.players).length-1<=parse(pastgame.imposters).length){
-                    res.status(410).send(currentgame.tasks==0||parse(currentgame.imposters).length==0?"Crewmates win":"Imposters win")
+                console.log(parse(currentgame.players).length-parse(pastgame.imposters).length, parse(pastgame.imposters).length)
+                if(
+                    // all tasks
+                    currentgame.tasks==0||
+                    // imposters 0
+                    parse(currentgame.imposters).length==0||
+                    // more imposters than crew
+                    (parse(currentgame.players).length-parse(pastgame.imposters).length)<=(parse(pastgame.imposters).length)||
+                    // jester
+                    currentgame.jester==true&&currentgame.jesters=="[]"
+                ){
+                    res.status(410).send(currentgame.jester==true&&currentgame.jesters=="[]"?"Jesters win":currentgame.tasks==0||parse(currentgame.imposters).length==0?"Crewmates win":"Imposters win")
                     clearInterval(interval)
                 }else if(pastgame.meeting!=currentgame.meeting){
                     console.log(pastgame.meeting,currentgame.meeting)
@@ -249,9 +268,10 @@ app.post("/:game/meeting/toggle/",async function(req, res){
         for(let i of req.body.eliminated){
             let player=await Player.findOne({where:{id:i}})
             await player.destroy()
-            let {players,imposters}=game
+            let {players,imposters,jesters}=game
             game.imposters=JSON.stringify(JSON.parse(imposters).filter(x=>x!=i))
             game.players=JSON.stringify(JSON.parse(players).filter(x=>x!=i))
+            game.jesters=JSON.stringify(JSON.parse(jesters).filter(x=>x!=i))
             await game.save()
             game=await Game.findOne({where:{code:req.params.game,passcode:req.query.passcode}})
         }
@@ -274,6 +294,7 @@ app.get("/:game/players/",async function(req, res){
         ){
             let players=[];
             let imposters=[];
+            let jesters=[];
             console.log(parse(game.players))
             for(let i of parse(game.players)){
                 let player=await Player.findOne({where:{id:i-0}})
@@ -281,10 +302,14 @@ app.get("/:game/players/",async function(req, res){
                 if(parse(game.imposters).includes(i-0)){
                     imposters.push(player)
                 }
+                if(parse(game.jesters).includes(i-0)){
+                    jesters.push(player)
+                }
             }
             res.json({
                 players:players,
-                imposters:imposters
+                imposters:imposters,
+                jesters:jesters,
             })
         }else{res.status(404).send("Game not found");return}
     }

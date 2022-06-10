@@ -1,1 +1,1 @@
-export default "https://play-server.aimedtuba.com"
+export default "https://play-server.aimedtuba.com";

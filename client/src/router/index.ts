@@ -38,6 +38,9 @@ const routes: RouteRecordRaw[]=[
     },{
         path: '/imposter/',
         component: () => import('../views/imposter.vue'),
+    },{
+        path: '/jester/',
+        component: () => import('../views/jester.vue'),
     }
 ]
 

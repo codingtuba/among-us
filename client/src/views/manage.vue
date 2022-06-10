@@ -23,9 +23,11 @@
       let data=await fetch(`${server}/${this.$route.params.g}/updates/?passcode=${cookies.get('passcode')}`)
       if(data.status==404){alert("Game not found");this.$router.push("/")}
       else if(data.status==410){
-        if(await data.text()=="Crewmates win"){
+        let text=await data.text()
+        if(text=="Crewmates win"){
           this.$router.push("/crew/")
-        }else{this.$router.push("/imposter/")}
+        }else if(text=="Imposters win"){this.$router.push("/imposter/")}
+        else {this.$router.push("/jester/")}
       }
       else setTimeout(()=>{location.reload()},500)
     }
